@@ -11,5 +11,6 @@ The body, legs, original firmware code, and original electronics all come from r
 makes the body a bit wider to accomodate some wider batteries. To do this, the meshes were repaired,
 and then imported into OpenSCAD for modification. This design also adds a place to mount a 5x7
 perfboard on top, and a GDS (Glitter Dispersal System) weapon. Both attach to the top of the
-widened spider robot's body.
+widened spider robot's body. I also made the mounts for the servos 1mm taller since the
+servos I got didn't fit in @regishsu's design.
 
