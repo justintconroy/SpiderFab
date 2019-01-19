@@ -55,19 +55,25 @@ module polyline(points, index, w) {
 }
 
 /* MAIN */
-union()
+difference()
 {
-	rotate_extrude($fn=50)
-	//polyline(bezier(p0,p1,p2),1,w);
-	polyline(cubic_bezier(p0,p1,p2,p3),1,1);
+    union()
+    {
+        rotate_extrude($fn=50)
+        //polyline(bezier(p0,p1,p2),1,w);
+        polyline(cubic_bezier(p0,p1,p2,p3),1,1);
 
-	translate([0,0,-5]) cylinder(r=radius+w+3,h=9,$fn=50);
+        translate([0,0,-5]) cylinder(r=radius+w+3,h=9,$fn=50);
 
-	for (i=[1:120:360]) {
-		rotate([0,0,i])
-		rotate([90,0,0])
-		linear_extrude(2)
-		translate([w+5,0,0])
-		polyline(cubic_bezier(p0+[-14,0],p1+[-14,0],p2+[-14,0],p3+[-14,0]),1,w);
-	}
+        for (i=[1:120:360]) {
+            rotate([0,0,i])
+            rotate([90,0,0])
+            linear_extrude(2)
+            translate([w+5,0,0])
+            polyline(cubic_bezier(p0+[-14,0],p1+[-14,0],p2+[-14,0],p3+[-14,0]),1,w);
+        }
+    }
+
+    translate([0,0,-8])
+    cylinder(d=2,h=9,$fn=50);
 }
