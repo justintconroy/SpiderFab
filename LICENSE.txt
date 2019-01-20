@@ -1,3 +1,4 @@
 Spider robot(quad robot, quadruped)-SG90 (https://www.thingiverse.com/thing:1009659) by regishsu is licensed under the GNU - GPL license.
 http://creativecommons.org/licenses/GPL/2.0/
 
+SpiderFab (quad robot with GDS) by @justintconroy is licensed under the same terms as the above.
