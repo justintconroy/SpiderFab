@@ -1,17 +1,17 @@
 include <relativity.scad>;
+use <ruler.scad>;
 
-//translated([0,0,130]) case();
+//translate([0,1,70]) rotate([-90,-90,0]) ruler(40);
+translated([0,0,52]) top_case();
 //colored("red", "support")
 //show("support")
-translated([0,0,6]) bottom_case();
+//translated([0,0,6]) bottom_case();
 //colored("yellow","port")
 //colored("green","cpu")
 //colored("red", "electronics,motor")
-//hide("motor,cpu,servo-plug-clearance")
+//show("motor,cpu,servo-plug-clearance")
 //translated([0,0,17.5]) electronics();
 //stencil();
-
-//gds_motor();
 
 
 module case()
@@ -32,6 +32,40 @@ module case()
 			rod(d=34, h=18, $class="hole");
 		}
 
+	}
+}
+
+module top_case()
+{
+	differed("hole", "top-case")
+	box([95.5,56,3], $class="top-case case")
+	{
+		// Support screw holes.
+		mirrored(x)
+		mirrored(y)
+		align(x+y+top, $class="screw hole")
+		translate([-5.5,-5.5,0])
+		rod(d=4,h=3, anchor=top-x-y, $fn=50, $class="screw hole");
+
+		align(top)
+		rod(d=38, h=14, $fn=50)
+		align(top)
+		{
+			// Hole for rotor.
+			rod(d=3, h=3, anchor=top, $class="hole");
+
+			// Hollow out.
+			translated([0,0,-3])
+			rod(d=34, h=18, anchor=top, $class="hole");
+
+			// Motor mount screw hole.
+			translated([10,0,0])
+			rod(d=3,h=3, anchor=top-x, $class="hole");
+
+			// Motor mount screw hole.
+			translated([-10,0,0])
+			rod(d=3,h=3, anchor=top+x, $class="hole");
+		}
 	}
 }
 
@@ -120,11 +154,13 @@ module gds_motor()
 	differed("slice", "motor")
 	rod(d=32, h=17.25, anchor=bottom, $fn=50, $class="gds motor")
 	{
+		// Top side/rotor
 		align(top)
-		{
-			//rod(d=6.15,
-		}
+		rod(d=6.15, h=2.25, anchor=bottom)
+		align(top)
+		rod(d=2, h=10.15, anchor=bottom);
 
+		// Bottom side/leads
 		align(bottom)
 		box([32,7.75,2], $class="gds motor")
 		align(bottom)
@@ -153,15 +189,15 @@ module gds_motor()
 
 module stencil()
 {
-	//color([.2,.2,.2,0.5])
+	color([.2,.2,.2,0.5])
 	union()
 	{
 		translate([0,0,75])
 		union()
 		{
 			import("gds.stl");
-			translated([0,0,-35])
-			gds_motor();
+//			translated([0,0,-29])
+//			gds_motor();
 		}
 
 //		rotate([0,180,0])
