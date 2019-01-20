@@ -2,6 +2,7 @@ include <relativity.scad>;
 use <ruler.scad>;
 
 //translate([0,1,70]) rotate([-90,-90,0]) ruler(40);
+translated([0,0,71]) gds_holder();
 translated([0,0,52]) top_case();
 //colored("red", "support")
 //show("support")
@@ -13,25 +14,43 @@ translated([0,0,52]) top_case();
 //translated([0,0,17.5]) electronics();
 //stencil();
 
+//gds_motor();
 
-module case()
+module gds_holder()
 {
-	differed("hole","case", $class="case")
+	align(bottom)
+	differed("hole", "gds-bottom")
+	rod(d=38, h=3, anchor=bottom, $class="gds-bottom")
 	{
+		rod(d=3, h=3.5, anchor=center, $fn=50, $class="hole");
 
-		align(top, $class="hole")
-		hulled("cone")
+		// Motor mount screw clearance.
+		translated([8,0,0])
+		rod(d=6,h=1.5, anchor=top-x, $fn=50, $class="hole");
+
+		// Motor mount screw clearance.
+		translated([-8,0,0])
+		rod(d=6,h=1.5, anchor=top+x, $fn=50, $class="hole");
+
+		align(top)
+		differed("cone-hole", "cone")
 		{
-			translated([0,0,1],$class="hole cone")
-			rod(d=110, h=infinitesimal)
-			align(bottom)
-			translated([0,0,-61])
-			rod(d=34, h=infinitesimal, $class="hole cone")
-			align(bottom)
-			translated([0,0,1])
-			rod(d=34, h=18, $class="hole");
-		}
+			hulled("cone", $class="cone")
+			{
+				rod(d=38, h=infinitesimal, $class="cone");
+				align(top)
+				translate([0,0,50])
+				rod(d=114, h=infinitesimal, $class="cone");
+			}
 
+			hulled("cone-hole", $class="cone-hole")
+			{
+				rod(d=34, h=infinitesimal, $class="hole cone-hole");
+				align(top)
+				translate([0,0,50])
+				rod(d=110, h=infinitesimal, $class="hole cone-hole");
+			}
+		}
 	}
 }
 
@@ -47,23 +66,24 @@ module top_case()
 		translate([-5.5,-5.5,0])
 		rod(d=4,h=3, anchor=top-x-y, $fn=50, $class="screw hole");
 
+		// Motor Holder
 		align(top)
 		rod(d=38, h=14, $fn=50)
 		align(top)
 		{
 			// Hole for rotor.
-			rod(d=3, h=3, anchor=top, $class="hole");
+			rod(d=8, h=3, anchor=top, $class="hole");
 
 			// Hollow out.
 			translated([0,0,-3])
 			rod(d=34, h=18, anchor=top, $class="hole");
 
 			// Motor mount screw hole.
-			translated([10,0,0])
+			translated([9.5,0,0])
 			rod(d=3,h=3, anchor=top-x, $class="hole");
 
 			// Motor mount screw hole.
-			translated([-10,0,0])
+			translated([-9.5,0,0])
 			rod(d=3,h=3, anchor=top+x, $class="hole");
 		}
 	}
@@ -151,7 +171,7 @@ module electronics()
 
 module gds_motor()
 {
-	differed("slice", "motor")
+	differed("slice,screw", "motor")
 	rod(d=32, h=17.25, anchor=bottom, $fn=50, $class="gds motor")
 	{
 		// Top side/rotor
@@ -159,6 +179,18 @@ module gds_motor()
 		rod(d=6.15, h=2.25, anchor=bottom)
 		align(top)
 		rod(d=2, h=10.15, anchor=bottom);
+
+		// Top side/screws
+		align(top)
+		{
+			// Motor mount screw hole.
+			translated([10,0,0])
+			rod(d=2,h=3, anchor=top-x, $class="screw hole");
+
+			// Motor mount screw hole.
+			translated([-10,0,0])
+			rod(d=2,h=3, anchor=top+x, $class="screw hole");
+		}
 
 		// Bottom side/leads
 		align(bottom)
@@ -196,8 +228,8 @@ module stencil()
 		union()
 		{
 			import("gds.stl");
-//			translated([0,0,-29])
-//			gds_motor();
+			translated([0,0,-29])
+			gds_motor();
 		}
 
 //		rotate([0,180,0])
