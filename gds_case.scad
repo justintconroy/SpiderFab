@@ -2,8 +2,10 @@ include <relativity.scad>;
 use <ruler.scad>;
 
 //translate([0,1,70]) rotate([-90,-90,0]) ruler(40);
-translated([0,0,71]) gds_holder();
-translated([0,0,52]) top_case();
+//translated([0,0,71])
+gds_holder();
+//translated([0,0,52])
+//top_case();
 //colored("red", "support")
 //show("support")
 //translated([0,0,6]) bottom_case();
@@ -27,10 +29,16 @@ module gds_holder()
 		// Motor mount screw clearance.
 		translated([8,0,0])
 		rod(d=6,h=1.5, anchor=top-x, $fn=50, $class="hole");
-
-		// Motor mount screw clearance.
 		translated([-8,0,0])
 		rod(d=6,h=1.5, anchor=top+x, $fn=50, $class="hole");
+
+		// GDS Mount screw holes.
+		align(top);
+		translated([0,9.5,0])
+		rod(d=3.75,h=3.5, anchor=center-y, $fn=50, $class="hole");
+		align(top);
+		translated([0,-9.5,0])
+		rod(d=3.75,h=3.5, anchor=center+y, $fn=50, $class="hole");
 
 		align(top)
 		differed("cone-hole", "cone")
@@ -81,10 +89,14 @@ module top_case()
 			// Motor mount screw hole.
 			translated([9.5,0,0])
 			rod(d=3,h=3, anchor=top-x, $class="hole");
-
-			// Motor mount screw hole.
 			translated([-9.5,0,0])
 			rod(d=3,h=3, anchor=top+x, $class="hole");
+
+			// GDS Mount screw holes.
+			translated([0,9.5,0])
+			rod(d=3.5,h=3, anchor=top-y, $class="hole");
+			translated([0,-9.5,0])
+			rod(d=3.5,h=3, anchor=top+y, $class="hole");
 		}
 	}
 }
