@@ -27,12 +27,18 @@
 
 #define L_TRIG 6        // Pin used for left trigger
 #define R_TRIG 3        // Pin used for right trigger
-#define L_JOYSTICK A3   // Pin used for left joystick
-#define R_JOYSTICK A0   // Pin used for right joystick
+
+#define L_STICK 5   // Pin used for left joystick button
+#define L_HORZ A2   // Pin used for left joystick horizontal
+#define L_VERT A3   // Pin used for left joystick vertical
+
+#define R_STICK 5   // Pin used for right joystick button
+#define R_HORZ A1   // Pin used for right joystick horizontal
+#define R_VERT A0   // Pin used for right joystick vertical
 
 int8_t speedLevel = 20; //Maximum speed (%) = speedLevel * 5 (units are percent)
 
-void setup() {  
+void setup() {
   Serial1.begin(9600); // Start serial communication with XBee at 9600 baud
   delay(10);
 
@@ -40,56 +46,50 @@ void setup() {
 
   pinMode(L_TRIG,INPUT_PULLUP); // Enable pullup resistor for left trigger
   pinMode(R_TRIG,INPUT_PULLUP); // Enable pullup resistor for right trigger
+  pinMode(L_STICK,INPUT_PULLUP); // Enable pullup resistor for left stick
+  pinMode(R_STICK,INPUT_PULLUP); // Enable pullup resistor for right stick
 }
 
 void loop() {
-  int16_t leftStick, rightStick;    // We'll store the the analog joystick values here
+  int16_t leftStickVert, rightStickVert;    // We'll store the the analog joystick values here
+  int16_t leftStickHorz, rightStickHorz;
   char buf0[10],buf1[10]; // character buffers used to set motor speeds
-
-  // Reduce top speed
-  if(digitalRead(L_TRIG) == 0)
-  {
-    speedLevel -= 2;
-    if(speedLevel < 2) speedLevel = 2;
-    while(digitalRead(L_TRIG) == 0)
-    {
-      delay(2);
-    }
-  }
-  // Increase top speed
-  if(digitalRead(R_TRIG) == 0)
-  {
-    speedLevel += 2;
-    if(speedLevel > 20) speedLevel = 20;
-    while(digitalRead(R_TRIG) == 0)
-    {
-      delay(2);
-    }
-  }
 
   // Read joysticks
   // Convert analog value range to motor speeds (in %)
-  leftStick = (5-(analogRead(L_JOYSTICK)/93))*speedLevel;
-  rightStick = (5-(analogRead(R_JOYSTICK)/93))*speedLevel;
+  leftStickVert = (5-(analogRead(L_VERT)/93))*speedLevel;
+  leftStickHorz = (5-(analogRead(L_HORZ)/93))*speedLevel;
+  rightStickVert = (5-(analogRead(R_VERT)/93))*speedLevel;
+  rightStickHorz = (5-(analogRead(R_HORZ)/93))*speedLevel;
 
   // Build motor 0 buffer
-  if(leftStick > 0)
+  if(leftStickVert > 90)
   {
-    sprintf(buf0,"M0F%d\r\n",leftStick);
+    sprintf(buf0,"w 2 1\r\n");
+  }
+  else if (leftStickVert < -90)
+  {
+    sprintf(buf0,"w 1 1\r\n");
   }
   else
   {
-    sprintf(buf0,"M0R%d\r\n",abs(leftStick));
+    sprintf(buf0,"");
+    //sprintf(buf0,"LV: %d\n", leftStickVert);
   }
 
   // Build motor 1 buffer
-  if(rightStick > 0)
+  if(leftStickHorz > 90)
   {
-    sprintf(buf1,"M1F%d\r\n",rightStick);
+    sprintf(buf1,"w 3 1\r\n");
+  }
+  else if (leftStickHorz < -90)
+  {
+    sprintf(buf1,"w 4 1\r\n");
   }
   else
   {
-    sprintf(buf1,"M1R%d\r\n",abs(rightStick));
+    //sprintf(buf1,"LH: %d\n", leftStickHorz);
+    sprintf(buf1,"");
   }
 
   // Send motor speeds
