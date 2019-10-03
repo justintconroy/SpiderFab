@@ -37,6 +37,11 @@ SerialCommand SCmd;   // The demo SerialCommand object
 Servo servo[4][3];
 //define servos' ports
 const int servo_pin[4][3] = { {2, 3, 4}, {5, 6, 7}, {8, 9, 10}, {11, 12, 13} };
+
+// GDS pins
+const int gds_forward_pin = A4;
+const int gds_reverse_pin = A5;
+const int gds_pwn_pin = A6;
 /* Size of the robot ---------------------------------------------------------*/
 const float length_a = 55;
 const float length_b = 77.5;
@@ -119,6 +124,13 @@ void setup()
   servo_attach();
   Serial.println("Servos initialized");
   Serial.println("Robot initialization Complete");
+
+  // Initialize GDS pins
+  pinMode(gds_forward_pin, OUTPUT);
+  pinMode(gds_reverse_pin, OUTPUT);
+  pinMode(gds_pwn_pin, OUTPUT);
+  Serial.println("GDS Online");
+
 }
 
 
@@ -191,6 +203,12 @@ void do_test(void)
 // w 4 x: left turn x step
 // w 5 x: hand shake x times
 // w 6 x: hand wave x times
+// w 7 x: Tilt body left by x amount
+// w 8 x: Tilt body right by x amount
+// w 9 x: Strafe left x steps
+// w 10 x: Strafe right x steps
+// w 21 1: Activate GDS
+// w 21 0: Deactivate GDS
 #define W_STAND_SIT    0
 #define W_FORWARD      1
 #define W_BACKWARD     2
@@ -202,6 +220,7 @@ void do_test(void)
 #define W_RBODY        8
 #define W_LSTRAFE      9
 #define W_RSTRAFE      10
+#define W_GDS          21
 void action_cmd(void)
 {
   char *arg;
@@ -282,6 +301,12 @@ void action_cmd(void)
         stand();
       //strafe_right(n_step);
       break;
+    case W_GDS:
+      Serial.print("GDS! ");
+      if (is_stand())
+        sit();
+      gds(n_step);
+      break;
     default:
       Serial.println("Error");
       break;
@@ -302,6 +327,39 @@ bool is_stand(void)
     return true;
   else
     return false;
+}
+
+/*
+   - activate/deactivate GDS
+*/
+void gds(int n_step)
+{
+  switch(n_step)
+  {
+    case 0:
+      // Stop
+      Serial.println("STOP!");
+      digitalWrite(gds_forward_pin, LOW);
+      digitalWrite(gds_reverse_pin, LOW);
+      analogWrite(gds_pwn_pin, 0);
+      break;
+    case 1:
+      // Full speed ahead!
+      Serial.println("FORWARD!");
+      digitalWrite(gds_forward_pin, HIGH);
+      digitalWrite(gds_reverse_pin, LOW);
+      analogWrite(gds_pwn_pin, 255);
+      break;
+    case 2:
+      // Full speed behind!
+      Serial.println("REVERSE!");
+      digitalWrite(gds_forward_pin, LOW);
+      digitalWrite(gds_reverse_pin, HIGH);
+      analogWrite(gds_pwn_pin, 255);
+      break;
+    default:
+      break;
+  }
 }
 
 /*
